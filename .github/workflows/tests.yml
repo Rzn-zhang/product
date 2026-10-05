@@ -1,0 +1,22 @@
+name: Prototype tests
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ['3.10', '3.12']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: VOC Lens tests
+        working-directory: voc-insight-platform
+        run: python -m unittest discover -s tests -v
+      - name: ModelBench tests
+        working-directory: llm-eval-workbench
+        run: python -m unittest discover -s tests -v

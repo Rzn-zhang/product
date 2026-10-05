@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ModelBench - LLM 产品评测</title><link rel="stylesheet" href="/styles.css"></head>
+<body>
+  <header><div class="brand"><b>MB</b><span>ModelBench</span></div><span class="local">离线评测 · 不发送数据</span></header>
+  <main>
+    <div class="heading"><div><p>LLM PRODUCT EVALUATION</p><h1>模型选型与 Bad Case 分析</h1><span>用统一测试集比较质量、延迟与成本，形成可解释的上线建议。</span></div><div class="actions"><label for="csvFile">导入评测 CSV</label><input id="csvFile" type="file" accept=".csv" hidden><button id="sample">恢复样例</button></div></div>
+    <div class="notice"><strong>数据声明</strong><span>内置数据使用匿名模型 A/B/C 和模拟响应，仅用于演示评测流程，不代表任何真实模型表现。</span></div>
+    <section id="summary" class="model-grid"></section>
+    <div class="layout">
+      <section class="panel"><div class="panel-head"><div><h2>产品选型矩阵</h2><p>先过质量护栏，再按业务策略比较质量、P95 延迟与成本</p></div><span id="recommendation"></span></div><div id="matrix"></div><div id="profiles" class="profiles"></div></section>
+      <section class="panel"><div class="panel-head"><div><h2>场景能力对比</h2><p>同一测试集下的质量得分</p></div></div><div id="categories"></div></section>
+    </div>
+    <section class="panel bad-panel"><div class="panel-head"><div><h2>Bad Case 工作台</h2><p>定位未通过用例、缺失关键词和无依据数字</p></div><select id="modelFilter"><option value="">全部模型</option></select></div><div class="table-wrap"><table><thead><tr><th>用例 / 场景</th><th>模型</th><th>回答</th><th>质量分</th><th>问题</th></tr></thead><tbody id="badCases"></tbody></table></div></section>
+    <section class="method"><div><strong>双层质量门槛</strong><span>单用例：质量分 ≥ 70 且忠实度 ≥ 0.8；模型：平均质量 ≥ 80 且通过率 ≥ 80%</span></div><div><strong>评测方法</strong><span>关键词覆盖 55% + 数值忠实度 25% + 格式合规 20%</span></div><div><strong>使用边界</strong><span>离线规则是基线；真实上线需人工标注与 LLM-as-Judge 校准</span></div></section>
+  </main>
+  <div id="toast"></div><script src="/app.js"></script>
+</body></html>

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VOC Lens - 用户反馈洞察</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark">VL</span><span>VOC Lens</span></div>
+    <div class="topbar-meta"><span id="datasetName">内置演示数据</span><span class="status"><i></i>本地分析</span></div>
+  </header>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="side-title">数据与模型</div>
+      <label class="upload" for="csvFile">
+        <span>上传反馈 CSV</span>
+        <small>首行需包含字段名</small>
+      </label>
+      <input id="csvFile" type="file" accept=".csv,text/csv" hidden>
+      <button id="loadSample" class="secondary full">恢复演示数据</button>
+
+      <div class="control-group">
+        <label for="textField">反馈文本字段</label>
+        <select id="textField"></select>
+      </div>
+      <div class="field-row">
+        <div class="control-group">
+          <label for="dateField">日期字段</label>
+          <select id="dateField"></select>
+        </div>
+        <div class="control-group">
+          <label for="ratingField">评分字段</label>
+          <select id="ratingField"></select>
+        </div>
+      </div>
+      <div class="control-group">
+        <label for="channelField">渠道字段</label>
+        <select id="channelField"></select>
+      </div>
+      <div class="control-group slider-head">
+        <label for="clusterCount">主题数量</label><output id="clusterOutput">6</output>
+        <input id="clusterCount" type="range" min="3" max="9" value="6">
+      </div>
+      <div class="side-title spacing">优先级权重</div>
+      <div class="weight-grid">
+        <label>反馈量 <input id="weightVolume" type="number" min="0" max="1" step="0.05" value="0.35"></label>
+        <label>负向率 <input id="weightNegative" type="number" min="0" max="1" step="0.05" value="0.45"></label>
+        <label>严重度 <input id="weightSeverity" type="number" min="0" max="1" step="0.05" value="0.20"></label>
+      </div>
+      <button id="analyzeButton" class="primary full">重新分析</button>
+    </aside>
+
+    <main class="main-content">
+      <div class="page-heading">
+        <div><p class="eyebrow">VOICE OF CUSTOMER</p><h1>用户反馈洞察</h1><p>从原始反馈定位高频问题，并形成可排序的产品机会。</p></div>
+        <div class="heading-actions"><button id="exportCsv" class="secondary">导出分析结果</button><button id="exportReport" class="primary">导出洞察简报</button></div>
+      </div>
+
+      <nav class="tabs" aria-label="分析视图">
+        <button class="tab active" data-tab="overview">总览</button>
+        <button class="tab" data-tab="topics">主题洞察</button>
+        <button class="tab" data-tab="records">反馈明细</button>
+        <button class="tab" data-tab="method">方法说明</button>
+      </nav>
+
+      <section id="overview" class="tab-panel active">
+        <div class="metrics">
+          <article><span>有效反馈</span><strong id="metricTotal">-</strong><small id="metricDuplicate">去重 - 条</small></article>
+          <article><span>负向反馈率</span><strong id="metricNegative">-</strong><small>需优先关注</small></article>
+          <article><span>高优机会</span><strong id="metricP0">-</strong><small>P0 主题数量</small></article>
+          <article><span>首要机会</span><strong class="text-metric" id="metricTop">-</strong><small>综合评分最高</small></article>
+        </div>
+        <div class="dashboard-grid">
+          <section class="panel sentiment-panel"><div class="panel-head"><div><h2>情感结构</h2><p>按文本情绪与评分综合判断</p></div></div><div class="sentiment-layout"><div class="donut" id="sentimentDonut"><div><strong id="donutRate">-</strong><span>负向</span></div></div><div id="sentimentLegend" class="legend"></div></div></section>
+          <section class="panel"><div class="panel-head"><div><h2>产品机会排行</h2><p>反馈量 × 负向率 × 严重度</p></div></div><div id="opportunityBars" class="bar-chart"></div></section>
+          <section class="panel wide"><div class="panel-head"><div><h2>反馈趋势</h2><p>按月追踪情感结构变化</p></div></div><div id="trendChart" class="trend-chart"></div></section>
+          <section class="panel"><div class="panel-head"><div><h2>高频表达</h2><p>去除常用停用词后统计</p></div></div><div id="keywordCloud" class="keyword-cloud"></div></section>
+        </div>
+      </section>
+
+      <section id="topics" class="tab-panel">
+        <div class="section-intro"><div><h2>主题机会池</h2><p>点击主题查看代表性负向反馈和建议动作。</p></div><div class="priority-key"><span class="p0">P0</span>立即处理 <span class="p1">P1</span>进入规划 <span class="p2">P2</span>持续观察</div></div>
+        <div id="topicTable" class="topic-table"></div>
+        <div id="topicDetail" class="topic-detail empty">选择一个主题查看详情</div>
+      </section>
+
+      <section id="records" class="tab-panel">
+        <div class="section-intro"><div><h2>分析明细</h2><p>支持按情感和主题筛选，核对模型归类结果。</p></div><div class="filters"><select id="sentimentFilter"><option value="">全部情感</option><option>正向</option><option>中性</option><option>负向</option></select><select id="topicFilter"><option value="">全部主题</option></select></div></div>
+        <div class="data-table-wrap"><table><thead><tr><th>反馈</th><th>情感</th><th>主题</th><th>置信度</th><th>渠道</th></tr></thead><tbody id="recordRows"></tbody></table></div>
+      </section>
+
+      <section id="method" class="tab-panel">
+        <div class="method-grid">
+          <article><span>01</span><h2>数据清洗</h2><p>统一空格与链接格式，过滤无效短文本，按标准化文本去重，并保留原始字段供回溯。</p></article>
+          <article><span>02</span><h2>情感判断</h2><p>使用可解释的中英双语词典，处理否定词与程度词；存在星级评分时，与文本分数加权融合。</p></article>
+          <article><span>03</span><h2>主题聚类</h2><p>从字符与词元生成 TF-IDF 向量，使用余弦距离 K-Means 聚类，再根据关键词映射业务主题。</p></article>
+          <article><span>04</span><h2>机会排序</h2><p>将反馈量、负向率和评分严重度组合为 0-100 分，权重可调，输出 P0/P1/P2 优先级。</p></article>
+        </div>
+        <div class="limitations"><h2>使用边界</h2><p>这是面向产品发现阶段的轻量分析工具，不替代人工研究。讽刺、隐喻和行业缩写可能造成误判；上线前应通过标注样本计算准确率，并持续复盘 Bad Case。</p></div>
+      </section>
+    </main>
+  </div>
+  <div id="toast" class="toast" role="status"></div>
+  <script src="/app.js"></script>
+</body>
+</html>
